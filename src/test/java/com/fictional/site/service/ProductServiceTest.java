@@ -1,7 +1,10 @@
 package com.fictional.site.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +48,9 @@ class ProductServiceTest {
 		
 		Optional<Product> responseProduct = service.findById(100);
 		
-		Assertions.assertTrue(responseProduct.isEmpty(), "Product exists" );		
+		Assertions.assertTrue(responseProduct.isEmpty(), "Product exists" );	
+		// Assert the response - Alternate
+//        Assertions.assertFalse(returnedProduct.isPresent(), "Product was found, when it shouldn't be");
 	}
 	
 	@Test
@@ -59,4 +64,31 @@ class ProductServiceTest {
 		
 		Assertions.assertTrue(updatedFlag, "Product was not found");	
 	}
+	
+	  @Test
+	    @DisplayName("Test findAll")
+	    void testFindAll() {
+	        // Setup our mock
+	        Product mockProduct = new Product(1, "Product Name", 10, 1);
+	        Product mockProduct2 = new Product(2, "Product Name 2", 15, 3);
+	        doReturn(Arrays.asList(mockProduct, mockProduct2)).when(repository).findAll();
+
+	        // Execute the service call
+	        List<Product> products = service.findAll();
+
+	        Assertions.assertEquals(2, products.size(), "findAll should return 2 products");
+	    }
+
+	    @Test
+	    @DisplayName("Test save product")
+	    void testSave() {
+	        Product mockProduct = new Product(1, "Product Name", 10);
+	        doReturn(mockProduct).when(repository).save(any());
+
+	        Product returnedProduct = service.save(mockProduct);
+
+	        Assertions.assertNotNull(returnedProduct, "The saved product should not be null");
+	        Assertions.assertEquals(1, returnedProduct.getVersion().intValue(),
+	                "The version for a new product should be 1");
+	    }
 }

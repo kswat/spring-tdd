@@ -1,5 +1,6 @@
 package com.fictional.site.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,21 +28,30 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	public Iterable<Product> findAll() {
+	public List<Product> findAll() {
 		logger.info("Find all products");
 		return productRepo.findAll();
 	}
 
 	@Override
 	public Product save(Product product) {
-		// TODO Auto-generated method stub
-		return null;
+		// Set the product version to 1 as we're adding a new product to the database
+        product.setVersion(1);
+
+        logger.info("Save product to the database: {}", product);
+        return productRepo.save(product);
 	}
 
 	@Override
 	public boolean update(Product prod) {
 		logger.info("Update product: {}", prod);
 		return productRepo.update(prod);
+	}
+
+	@Override
+	public boolean delete(Integer id) {
+		logger.info("Delete product: {}", id);
+		return productRepo.delete(id);
 	}
 
 }

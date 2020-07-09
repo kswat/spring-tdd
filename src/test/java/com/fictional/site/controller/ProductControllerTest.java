@@ -1,9 +1,12 @@
 package com.fictional.site.controller;
 
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fictional.site.model.Product;
 import com.fictional.site.service.ProductService;
 
@@ -65,4 +69,71 @@ class ProductControllerTest {
 			.andExpect(jsonPath("$.id", is(1)))
 			.andExpect(jsonPath("$.name", is("Product A")));
 	}
+	
+	@Test
+    @DisplayName("PUT /product/10 - Success")
+    void testProductPutSuccess() throws Exception {
+        // Setup mocked service
+        Product putProduct = new Product("Product A", 10);
+        Product mockProduct = new Product(10, "Product Name", 10, 1);
+        doReturn(Optional.of(mockProduct)).when(service).findById(10);
+        doReturn(true).when(service).update(any());
+        
+        mockMvc.perform(put("/product/{id}", 10)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.header(HttpHeaders.IF_MATCH, 1)
+        		.content(asJsonString(putProduct))) //end perform
+        		
+        		// Validate the response code and content type
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                
+                .andExpect(header().string(HttpHeaders.ETAG, "\"2\""))
+                
+                .andExpect(jsonPath("$.id", is(10)))
+    			.andExpect(jsonPath("$.name", is("Product A")));
+        
+	}
+	
+    static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    @Test
+    @DisplayName("PUT /product/1 - Version Mismatch")
+    void testProductPutVersionMismatch() throws Exception {
+        // Setup mocked service
+        Product putProduct = new Product("Product Name", 10);
+        Product mockProduct = new Product(1, "Product Name", 10, 3);//already 3
+        doReturn(Optional.of(mockProduct)).when(service).findById(1);
+        doReturn(true).when(service).update(any());
+
+        mockMvc.perform(put("/product/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.IF_MATCH, 2) //this becomes 3  but mockproduct is already 3..hence conflict
+                .content(asJsonString(putProduct)))
+
+                // Validate the response code and content type
+                .andExpect(status().isConflict());
+    }
+    
+    @Test
+    @DisplayName("PUT /product/1 - Not Found")
+    void testProductPutNotFound() throws Exception {
+        // Setup mocked service
+        Product putProduct = new Product("Product Name", 10);
+        doReturn(Optional.empty()).when(service).findById(1);
+
+        mockMvc.perform(put("/product/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.IF_MATCH, 1)
+                .content(asJsonString(putProduct)))
+
+                // Validate the response code and content type
+                .andExpect(status().isNotFound());
+    }
 }

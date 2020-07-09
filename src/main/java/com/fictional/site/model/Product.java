@@ -31,6 +31,10 @@ public class Product {
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
+	
+	public Product() {		
+	}
+	
 	public Product(Integer id, String name, Integer quantity, Integer version) {
 		this.id = id;
 		this.name = name;
@@ -38,7 +42,9 @@ public class Product {
 		this.version = version;
 	}
 	
-	public Product() {		
-	}
 	
+	public Product(String name, Integer quantity) {
+		this.name = name;
+		this.quantity = quantity;
+	}
 }

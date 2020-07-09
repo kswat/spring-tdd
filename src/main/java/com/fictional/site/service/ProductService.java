@@ -12,4 +12,6 @@ public interface ProductService {
 
 	public Product save(Product product);
 
+	public boolean update(Product prod);
+
 }

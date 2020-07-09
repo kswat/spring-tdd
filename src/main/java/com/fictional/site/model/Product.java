@@ -31,5 +31,14 @@ public class Product {
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
-    
+	public Product(Integer id, String name, Integer quantity, Integer version) {
+		this.id = id;
+		this.name = name;
+		this.quantity = quantity;
+		this.version = version;
+	}
+	
+	public Product() {		
+	}
+	
 }

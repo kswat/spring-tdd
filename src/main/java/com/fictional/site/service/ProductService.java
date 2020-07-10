@@ -3,17 +3,17 @@ package com.fictional.site.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.fictional.site.model.Product;
+import com.fictional.site.model.ProductDTO;
 
 public interface ProductService {
 
-	public Optional<Product> findById(Integer id) ;
+	public Optional<ProductDTO> findById(Integer id) ;
 
-	public List<Product> findAll();
+	public List<ProductDTO> findAll();
 
-	public Product save(Product product);
+	public ProductDTO save(ProductDTO product);
 
-	public boolean update(Product prod);
+	public boolean update(ProductDTO prod);
 
 	public boolean delete(Integer id);
 

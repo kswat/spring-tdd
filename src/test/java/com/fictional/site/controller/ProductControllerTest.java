@@ -26,7 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fictional.site.model.Product;
+import com.fictional.site.model.ProductDTO;
 import com.fictional.site.service.ProductService;
 
 @SpringBootTest
@@ -58,7 +58,7 @@ class ProductControllerTest {
 	@Test
 	@DisplayName("GET /product/1 - Found")
 	void testGetProductByIdFound() throws Exception {
-		Product mockProduct = new Product(1,"Product A",10,1);
+		ProductDTO mockProduct = new ProductDTO(1,"Product A",10,1);
 		doReturn(Optional.of(mockProduct)).when(service).findById(1);
 		mockMvc.perform(get("/product/{id}", 1))
 		
@@ -75,8 +75,8 @@ class ProductControllerTest {
     @DisplayName("PUT /product/10 - Success")
     void testProductPutSuccess() throws Exception {
         // Setup mocked service
-        Product putProduct = new Product("Product A", 10);
-        Product mockProduct = new Product(10, "Product Name", 10, 1);
+        ProductDTO putProduct = new ProductDTO("Product A", 10);
+        ProductDTO mockProduct = new ProductDTO(10, "Product Name", 10, 1);
         doReturn(Optional.of(mockProduct)).when(service).findById(10);
         doReturn(true).when(service).update(any());
         
@@ -108,8 +108,8 @@ class ProductControllerTest {
     @DisplayName("PUT /product/1 - Version Mismatch")
     void testProductPutVersionMismatch() throws Exception {
         // Setup mocked service
-        Product putProduct = new Product("Product Name", 10);
-        Product mockProduct = new Product(1, "Product Name", 10, 3);//already 3
+        ProductDTO putProduct = new ProductDTO("Product Name", 10);
+        ProductDTO mockProduct = new ProductDTO(1, "Product Name", 10, 3);//already 3
         doReturn(Optional.of(mockProduct)).when(service).findById(1);
         doReturn(true).when(service).update(any());
 
@@ -126,7 +126,7 @@ class ProductControllerTest {
     @DisplayName("PUT /product/1 - Not Found")
     void testProductPutNotFound() throws Exception {
         // Setup mocked service
-        Product putProduct = new Product("Product Name", 10);
+        ProductDTO putProduct = new ProductDTO("Product Name", 10);
         doReturn(Optional.empty()).when(service).findById(1);
 
         mockMvc.perform(put("/product/{id}", 1)
@@ -142,8 +142,8 @@ class ProductControllerTest {
     @DisplayName("POST  /product - Create success")
     void testCreateProduct() throws Exception {
         // Setup mocked service
-        Product postProduct = new Product("Product X", 10);
-        Product mockProduct = new Product(1, "Product X", 10, 1);
+        ProductDTO postProduct = new ProductDTO("Product X", 10);
+        ProductDTO mockProduct = new ProductDTO(1, "Product X", 10, 1);
         doReturn(mockProduct).when(service).save(any());
 
         mockMvc.perform(post("/product")
@@ -164,7 +164,7 @@ class ProductControllerTest {
     @DisplayName("DELETE /product/1 - Success")
     void testProductDeleteSuccess() throws Exception {
         // Setup mocked product
-        Product mockProduct = new Product(1, "Product Name", 10, 1);
+        ProductDTO mockProduct = new ProductDTO(1, "Product Name", 10, 1);
 
         // Setup the mocked service
         doReturn(Optional.of(mockProduct)).when(service).findById(1);
@@ -190,7 +190,7 @@ class ProductControllerTest {
     @DisplayName("DELETE /product/1 - Failure")
     void testProductDeleteFailure() throws Exception {
         // Setup mocked product
-        Product mockProduct = new Product(1, "Product Name", 10, 1);
+        ProductDTO mockProduct = new ProductDTO(1, "Product Name", 10, 1);
 
         // Setup the mocked service
         doReturn(Optional.of(mockProduct)).when(service).findById(1);

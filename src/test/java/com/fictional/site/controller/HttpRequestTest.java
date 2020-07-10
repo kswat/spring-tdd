@@ -8,8 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+import com.fictional.site.SpringTddApplication;
+
+@SpringBootTest(classes = SpringTddApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+//@EnableJpaRepositories
 public class HttpRequestTest {
 
 	@LocalServerPort

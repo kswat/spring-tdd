@@ -2,6 +2,7 @@ package com.fictional.site.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fictional.site.model.Product;
+import com.fictional.site.model.ProductDTO;
 import com.fictional.site.service.ProductService;
 
 @RestController
@@ -26,6 +27,7 @@ public class ProductController {
 	private static final String PRODUCT_ROOT = "/product/";
 	private static final Logger logger = LogManager.getLogger(ProductController.class);
 	private final ProductService productService;
+	
 	
 	public ProductController(ProductService productService) {
         this.productService = productService;
@@ -50,15 +52,15 @@ public class ProductController {
 	}
 	
 	@GetMapping("/products")
-	public Iterable<Product> getProducts() {
+	public List<ProductDTO> getProducts() {
 		return productService.findAll();
 	}
 	
 	@PostMapping("/product")
-	public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+	public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO product) {
         logger.info("Creating new product with name: {}, quantity: {}", product.getName(), product.getQuantity());
         
-        Product newProduct = productService.save(product);	        
+        ProductDTO newProduct = productService.save(product);	        
         try {
         	return ResponseEntity
         			.created(new URI(PRODUCT_ROOT + product.getId()))
@@ -70,12 +72,12 @@ public class ProductController {
 	 }
 	
 	@PutMapping("/product/{id}")
-	public ResponseEntity<?> updateProduct(@RequestBody Product product, @PathVariable Integer id,
+	public ResponseEntity<?> updateProduct(@RequestBody ProductDTO product, @PathVariable Integer id,
 											@RequestHeader("If-Match") Integer ifMatch) {
 		logger.info("Updating product with id: {}, name: {}, quantity: {}", id, product.getName(), product.getQuantity());
 		
 		 // Get the existing product
-        Optional<Product> existingProduct = productService.findById(id);
+        Optional<ProductDTO> existingProduct = productService.findById(id);
         
         //compare eTags
         return existingProduct.map(prod ->{
@@ -106,20 +108,22 @@ public class ProductController {
         }).orElse(ResponseEntity.notFound().build());
 	}
 	
-	   @DeleteMapping("/product/{id}")
-	    public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
+   @DeleteMapping("/product/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
 
-	        logger.info("Deleting product with ID {}", id);
+        logger.info("Deleting product with ID {}", id);
 
-	        // Get the existing product
-	        Optional<Product> existingProduct = productService.findById(id);
+        // Get the existing product
+        Optional<ProductDTO> existingProduct = productService.findById(id);
 
-	        return existingProduct.map(p -> {
-	            if (productService.delete(p.getId())) {
-	                return ResponseEntity.ok().build();
-	            } else {
-	                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	            }
-	        }).orElse(ResponseEntity.notFound().build());
-	    }
+        return existingProduct.map(p -> {
+            if (productService.delete(p.getId())) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }).orElse(ResponseEntity.notFound().build());
+    }
+   
+
 }

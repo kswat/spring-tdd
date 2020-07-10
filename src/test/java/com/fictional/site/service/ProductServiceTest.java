@@ -10,11 +10,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.fictional.site.model.Product;
+import com.fictional.site.entity.Product;
+import com.fictional.site.model.ProductDTO;
 import com.fictional.site.repository.ProductRepository;
 
 @SpringBootTest
@@ -28,25 +30,28 @@ class ProductServiceTest {
     @MockBean
     private ProductRepository repository;
     
+	@Autowired
+    private ModelMapper modelMapper;
+    
 	@Test
 	@DisplayName("Test findById Success")
 	void testFindByIdSuccess() {
-		Product mockProduct = new Product(1, "Product A", 10, 1);
+		ProductDTO mockProduct = new ProductDTO(1, "Product A", 10, 1);
 		doReturn(Optional.of(mockProduct)).when(repository).findById(1);
 		
-		Optional<Product> responseProduct = service.findById(1);
+		Optional<ProductDTO> responseProduct = service.findById(1);
 		
 		Assertions.assertTrue(responseProduct.isPresent(), "Product was not found");
-        Assertions.assertSame(responseProduct.get(), mockProduct, "Products should be the same");		
+        Assertions.assertSame(mockProduct,responseProduct.get(), "Products should be the same");		
 	}
 
 	@Test
 	@DisplayName("Test findById empty")
 	void testFindByIdEmpty() {
-		Product mockProduct = new Product(1, "Product A", 10, 1);
+		ProductDTO mockProduct = new ProductDTO(1, "Product A", 10, 1);
 		doReturn(Optional.empty()).when(repository).findById(100);
 		
-		Optional<Product> responseProduct = service.findById(100);
+		Optional<ProductDTO> responseProduct = service.findById(100);
 		
 		Assertions.assertTrue(responseProduct.isEmpty(), "Product exists" );	
 		// Assert the response - Alternate
@@ -56,11 +61,14 @@ class ProductServiceTest {
 	@Test
 	@DisplayName("Test update product Success")
 	void testUpdateByIdSuccess() {
-		Product mockProduct = new Product(1, "Product A", 10, 1);
+		ProductDTO mockProductDTO = new ProductDTO(1, "Product A", 10, 1);
+		Product mockProduct = modelMapper.map(mockProductDTO, Product.class);
+		Product afterUpdateProduct = new Product(1, "Product B", 10, 1);
+		ProductDTO mockUpdateProductDTO = new ProductDTO(1, "Product B", 10, 2);
 		doReturn(Optional.of(mockProduct)).when(repository).findById(1);
-		doReturn(true).when(repository).update(mockProduct);
+		doReturn(afterUpdateProduct).when(repository).save(any(Product.class));
 		
-		boolean updatedFlag = service.update(service.findById(1).get());
+		boolean updatedFlag = service.update(mockUpdateProductDTO);//service.findById(1).get());
 		
 		Assertions.assertTrue(updatedFlag, "Product was not found");	
 	}
@@ -74,7 +82,7 @@ class ProductServiceTest {
 	        doReturn(Arrays.asList(mockProduct, mockProduct2)).when(repository).findAll();
 
 	        // Execute the service call
-	        List<Product> products = service.findAll();
+	        List<ProductDTO> products = service.findAll();
 
 	        Assertions.assertEquals(2, products.size(), "findAll should return 2 products");
 	    }
@@ -82,10 +90,11 @@ class ProductServiceTest {
 	    @Test
 	    @DisplayName("Test save product")
 	    void testSave() {
-	        Product mockProduct = new Product(1, "Product Name", 10);
-	        doReturn(mockProduct).when(repository).save(any());
+	        ProductDTO mockProduct = new ProductDTO(1, "Product Name", 10);
+	        Product product = new Product(1, "Product Name", 10, 1);
+	        doReturn(product).when(repository).save(any());
 
-	        Product returnedProduct = service.save(mockProduct);
+	        ProductDTO returnedProduct = service.save(mockProduct);
 
 	        Assertions.assertNotNull(returnedProduct, "The saved product should not be null");
 	        Assertions.assertEquals(1, returnedProduct.getVersion().intValue(),

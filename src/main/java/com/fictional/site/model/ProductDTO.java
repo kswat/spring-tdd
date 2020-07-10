@@ -1,6 +1,6 @@
 package com.fictional.site.model;
 
-public class Product {
+public class ProductDTO {
 
 	private Integer id;
     private String name;
@@ -32,10 +32,10 @@ public class Product {
 		this.version = version;
 	}
 	
-	public Product() {		
+	public ProductDTO() {		
 	}
 	
-	public Product(Integer id, String name, Integer quantity, Integer version) {
+	public ProductDTO(Integer id, String name, Integer quantity, Integer version) {
 		this.id = id;
 		this.name = name;
 		this.quantity = quantity;
@@ -43,12 +43,12 @@ public class Product {
 	}
 	
 	
-	public Product(String name, Integer quantity) {
+	public ProductDTO(String name, Integer quantity) {
 		this.name = name;
 		this.quantity = quantity;
 	}
 	
-	public Product(Integer id, String name, Integer quantity) {
+	public ProductDTO(Integer id, String name, Integer quantity) {
 		this.id = id;
 		this.name = name;
 		this.quantity = quantity;
